@@ -18,9 +18,7 @@ class Frontier:
             await self._queue.put(normalized_url)
 
     async def get_next_url(self) -> Optional[str]:
-        if not self._queue.empty():
-            return await self._queue.get()
-        return None
+        return await asyncio.wait_for(self._queue.get(), timeout=10)
 
     def _is_valid_url(self, url: str) -> bool:
         parsed_url = urlparse(url)

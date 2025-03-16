@@ -38,9 +38,6 @@ class Crawler:
         """
         while not self._max_pages_reached.is_set():
             url = await self._frontier.get_next_url()
-            if url is None:
-                await asyncio.sleep(0.1)  # TODO: this is really bad
-                continue
 
             final_url, content = await self._client.fetch(url)
             if content:
