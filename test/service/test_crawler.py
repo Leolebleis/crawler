@@ -37,6 +37,41 @@ def max_pages_reached() -> asyncio.Event:
     return asyncio.Event()
 
 
+async def test_crawler_runs_successfully(
+    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+) -> None:
+    # Mock behavior
+    mock_frontier.get_next_url.side_effect = [
+        "https://example.com/page1",
+        "https://example.com/page2",
+        None,  # Simulate empty queue
+    ]
+    mock_client.fetch.side_effect = [
+        ("https://example.com/page1", """<html>
+            <a href="https://example.com/page3">Link</a>
+        </html>"""),
+        ("https://example.com/page2", """<html><a href="https://example.com/page4">Link</a></html>"""),
+    ]
+    mock_reporter.results = {}  # Start with no results
+
+    crawler = Crawler(
+        frontier=mock_frontier,
+        client=mock_client,
+        reporter=mock_reporter,
+        max_pages_reached=max_pages_reached,
+        max_pages=5,
+    )
+
+    # Run the crawler
+    await crawler.run()
+
+    # Assertions
+    assert not max_pages_reached.is_set()
+    assert mock_frontier.get_next_url.call_count == 3  # Two pages + None
+    assert mock_client.fetch.call_count == 2
+    assert mock_reporter.record.call_count == 2
+    assert mock_frontier.add_url.call_count == 2
+
 async def test_crawler_stops_at_max_pages(
     mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
 ) -> None:
