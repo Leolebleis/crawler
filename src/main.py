@@ -4,42 +4,14 @@ import logging
 import time
 from urllib.parse import urlparse
 
-from service.parser import parse
+from service.crawler import Crawler
 from src.client.http_client import Client
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
 
 logger = logging.getLogger(__name__)
 
-async def worker(allowed_netloc: str, reporter: Reporter, frontier: Frontier, max_depth: int,
-                 depth_reached: asyncio.Event) -> None:
-    client = Client(allowed_netloc)
-    try:
-        while not depth_reached.is_set():
-            url = await frontier.get_next_url()
-            if url is None:
-                await asyncio.sleep(0.1)  # Prevent tight loop if queue is empty
-                continue
-
-            final_url, content = await client.fetch(url)
-            if content:
-                links = parse(final_url, content)
-                reporter.record(final_url, links)
-
-                # Check depth before adding new links
-                if len(reporter.results) >= max_depth:
-                    depth_reached.set()
-                    break
-
-                for link in links:
-                    if len(reporter.results) < max_depth:
-                        await frontier.add_url(link)
-                    else:
-                        break
-    finally:
-        await client.close()
-
-async def main(start_url: str, num_workers: int, depth: int) -> None:
+async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     logger.info(f"Starting the crawler with {num_workers} workers...")
     start_time = time.perf_counter()
 
@@ -47,14 +19,16 @@ async def main(start_url: str, num_workers: int, depth: int) -> None:
     frontier = Frontier(base_netloc)
     await frontier.add_url(start_url)
     reporter = Reporter()
+    client = Client(base_netloc)
 
-    # Create a shared event to signal when depth is reached
-    depth_reached = asyncio.Event()
+    # Create a shared event to signal when max number of pages is reached
+    # This is a coroutine-safe way to warn all workers to stop crawling when the limit is reached.
+    max_pages_reached = asyncio.Event()
 
     # Worker tasks
     tasks = [
         asyncio.create_task(
-            worker(base_netloc, reporter, frontier, depth, depth_reached)
+            Crawler(frontier, client, reporter, max_pages_reached, max_pages).run()
         )
         for _ in range(num_workers)
     ]
@@ -67,6 +41,7 @@ async def main(start_url: str, num_workers: int, depth: int) -> None:
     reporter.output()
 
     logger.debug(f"Crawling completed in {duration:.2f} seconds")
+    await client.close()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -86,13 +61,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--depth",
+        "--max-pages",
         type=int,
         default=10,
-        help="The maximum depth to crawl. Defaults to 10.",
+        help="The maximum pages to crawl. Defaults to 10.",
     )
 
     args = parser.parse_args()
 
     # Run the crawler
-    asyncio.run(main(args.start_url, args.workers, args.depth))
+    asyncio.run(main(args.start_url, args.workers, args.max_pages))
