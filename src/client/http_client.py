@@ -31,7 +31,6 @@ class Client:
 
         try:
             logger.debug(f"Fetching URL: {url}")
-            await asyncio.sleep(1)
             async with self._session.get(url) as response:
                 response.raise_for_status()  # Raise an exception for HTTP errors (4xx, 5xx)
 

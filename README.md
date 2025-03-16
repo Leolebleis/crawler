@@ -35,7 +35,7 @@ documented and easy to use.
 
 - [x] Add a `requirements.txt` file
 - [ ] Add sequence diagram and architecture diagram
-- [ ] Relative URLs?
+- [ ] Test redirect URLs as they do not start with netloc
 
 ## Running
 

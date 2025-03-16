@@ -37,7 +37,11 @@ class Crawler:
         :return: None
         """
         while not self._max_pages_reached.is_set():
-            url = await self._frontier.get_next_url()
+            try:
+                url = await self._frontier.get_next_url()
+            except asyncio.TimeoutError:
+                logger.info("Frontier is empty. Stopping the crawler.")
+                break
 
             final_url, content = await self._client.fetch(url)
             if content:

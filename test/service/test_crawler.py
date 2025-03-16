@@ -69,6 +69,55 @@ async def test_crawler_stops_at_max_pages(
 
     # Check the results
     assert mock_reporter.record.call_count == max_pages
+    assert mock_frontier.get_next_url.call_count == max_pages
 
 
-def test_crawler_stops_when_not_enough_pages() -> None: ...
+async def test_crawler_processes_until_queue_empty(
+    mock_frontier, mock_client, mock_reporter, max_pages_reached
+):
+    # Mock behavior
+    mock_frontier.get_next_url.side_effect = [
+        "https://example.com/page1",
+        "https://example.com/page2",
+        asyncio.TimeoutError(),  # Raise TimeoutError to stop the loop and simulate empty queue
+    ]
+    mock_client.fetch.return_value = ("https://example.com/page1", "<html>...</html>")
+    mock_reporter.results = {}  # Start with no results
+
+    crawler = Crawler(
+        frontier=mock_frontier,
+        client=mock_client,
+        reporter=mock_reporter,
+        max_pages_reached=max_pages_reached,
+        max_pages=5,
+    )
+    # Run crawler
+    await crawler.run()
+
+    # Assertions
+    assert not max_pages_reached.is_set()
+    assert mock_frontier.get_next_url.call_count == 3
+    mock_client.fetch.assert_called()
+    mock_reporter.record.assert_called()
+
+
+async def test_crawler_handles_fetch_errors(
+    mock_frontier, mock_client, mock_reporter, max_pages_reached
+):
+    # Mock behavior
+    mock_frontier.get_next_url.return_value = "https://example.com/page1"
+    mock_client.fetch.side_effect = Exception("Fetch failed")  # Simulate fetch error
+    mock_reporter.results = {}  # Start with no results
+
+    # Run crawler
+    await Crawler(
+        frontier=mock_frontier,
+        client=mock_client,
+        reporter=mock_reporter,
+        max_pages_reached=max_pages_reached,
+        max_pages=5,
+    ).run()
+
+    # Assertions
+    mock_reporter.record.assert_not_called()  # Ensure record was not called
+    mock_frontier.add_url.assert_not_called()  # Ensure no links were added
