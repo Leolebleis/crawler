@@ -12,7 +12,18 @@ This is possible through the use of a `max_pages_reached: asyncio.Event` object 
 pages has been reached. This event is checked by each worker before they start crawling a new page, and if it is set,
 they will stop.
 
-As the program uses asyncio, every worker runs on a single thread.
+As the program uses asyncio, all the workers run on a single thread.
+
+## Architecture
+
+The web crawler consists of the following components:
+- **Frontier**: Manages the queue of URLs to crawl and ensures URLs are not visited multiple times.
+- **Client**: Handles HTTP requests to fetch web pages.
+- **Parser**: Extracts links from HTML content.
+- **Reporter**: Records the results of the crawl (e.g., URLs and their links).
+- **Crawler**: Orchestrates the crawling process by coordinating the other components.
+
+The program uses an event-driven architecture with `asyncio` to enable concurrent fetching and processing of URLs.
 
 ### Asyncio and the Global Interpreter Lock (GIL)
 
@@ -29,14 +40,6 @@ uses asyncio, or coroutines, which run on a single thread. This approach achieve
 the main bottleneck in this application is the network I/O, asyncio is a good choice for this. It is also extremely well
 documented and easy to use.
 
-## Architecture
-
-## TODO
-
-- [x] Add a `requirements.txt` file
-- [ ] Add sequence diagram and architecture diagram
-- [ ] Test redirect URLs as they do not start with netloc
-
 ## Running
 
 ### Installation
@@ -50,7 +53,7 @@ pip install -r requirements.txt
 
 To run the crawler, run the following command:
 ```bash
-python -m src.main # TODO: this doesnt work because of $PYTHONPATH
+python -m src.main
 ```
 
 You can also add the following optional arguments:
@@ -73,7 +76,7 @@ This will make sure that the code is linted and formatted before each commit.
 To run the tests, run the following command:
 ```bash
 pytest
-``` 
+```
 
 ## Assumptions and Limitations
 
@@ -86,5 +89,6 @@ pytest
 
 ## Further reading
 
+- https://docs.python.org/3/library/asyncio.html
 - https://tonybaloney.github.io/posts/sub-interpreter-web-workers.html
 - https://dev.to/welldone2094/async-programming-in-python-with-asyncio-12dl

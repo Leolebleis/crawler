@@ -18,17 +18,19 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     _logger.info(f"Starting the crawler with {num_workers} workers...")
     start_time = time.perf_counter()
 
+    # Initialize the components
     base_netloc = urlparse(start_url).netloc
     frontier = Frontier(base_netloc)
+    # We add the start URL to the frontier to kick off the crawling process.
     await frontier.add_url(start_url)
     reporter = Reporter()
     client = Client(base_netloc)
 
-    # Create a shared event to signal when max number of pages is reached
+    # Create a shared event to signal when max number of pages is reached.
     # This is a coroutine-safe way to warn all workers to stop crawling when the limit is reached.
     max_pages_reached = asyncio.Event()
 
-    # Worker tasks
+    # We create the workers, each of which will run an instance of the Crawler class.
     tasks = [
         asyncio.create_task(
             Crawler(frontier, client, reporter, max_pages_reached, max_pages).run()
@@ -41,9 +43,11 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     end_time = time.perf_counter()
     duration = end_time - start_time
 
+    # Log the results
     reporter.output()
     _logger.info(f"Crawled {len(reporter.results)} pages in {duration:.2f} seconds")
 
+    # We close the client after all tasks are done to ensure all connections are closed properly.
     await client.close()
 
 
@@ -52,6 +56,7 @@ if __name__ == "__main__":
         level=_DEFAULT_LOG_LEVEL,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="A simple web crawler.")
     parser.add_argument(
