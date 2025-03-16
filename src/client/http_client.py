@@ -1,11 +1,11 @@
 import asyncio
-import logging
 from typing import Optional
 from urllib.parse import urlparse
 
 import aiohttp
+from aiologger import Logger
 
-logger = logging.getLogger(__name__)
+logger = Logger.with_default_handlers()
 
 
 class Client:

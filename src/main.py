@@ -1,6 +1,6 @@
 import argparse
 import asyncio
-import logging
+from aiologger import Logger
 import time
 from urllib.parse import urlparse
 
@@ -9,7 +9,7 @@ from src.service.crawler import Crawler
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
 
-logger = logging.getLogger(__name__)
+logger = Logger.with_default_handlers()
 
 async def worker(start_url: str, depth: int, allowed_netloc: str, reporter: Reporter, frontier: Frontier) -> None:
     client = Client(allowed_netloc)

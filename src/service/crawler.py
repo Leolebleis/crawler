@@ -1,11 +1,11 @@
-import logging
+from aiologger import Logger
 
 from src.client.http_client import Client
 from src.service.frontier import Frontier
 from src.service.parser import parse
 from src.service.reporter import Reporter
 
-logger = logging.getLogger(__name__)  # TODO: replace with aiologger
+logger = Logger.with_default_handlers()
 
 
 class Crawler:
