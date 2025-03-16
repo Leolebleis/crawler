@@ -12,6 +12,23 @@ This is possible through the use of a `max_pages_reached: asyncio.Event` object 
 pages has been reached. This event is checked by each worker before they start crawling a new page, and if it is set,
 they will stop.
 
+As the program uses asyncio, every worker runs on a single thread.
+
+### Asyncio and the Global Interpreter Lock (GIL)
+
+Until Python 3.12, the Global Interpreter Lock (GIL) acted as a mutex that protected access to Python objects, meaning
+that even if you had multiple threads, only one could execute Python code at a time. This was a limitation of the
+language itself. One advantage of this approach is that it makes it easier to write thread-safe code, as the GIL ensures
+thread-safety. One big drawback is that Python threads cannot take advantage of multiple cores.
+
+With more recent versions of Python, the GIL has been relaxed, allowing for concurrency. This is achieved through
+sub-interpreters, which are separate interpreters that run in separate threads with their own GIL. This is not
+
+With modern Python, there are many ways to achieve concurrency, each with their own trade-offs. However, this program
+uses asyncio, or coroutines, which run on a single thread. This approach achieves concurrency, _but not parallelism_. As
+the main bottleneck in this application is the network I/O, asyncio is a good choice for this. It is also extremely well
+documented and easy to use.
+
 ## Architecture
 
 ## TODO
@@ -56,7 +73,7 @@ This will make sure that the code is linted and formatted before each commit.
 To run the tests, run the following command:
 ```bash
 pytest
-```
+``` 
 
 ## Assumptions and Limitations
 
@@ -65,3 +82,9 @@ pytest
   still processing their current page. This is a limitation of the current implementation.
 - The program does not check robots.txt. This is a limitation of the current implementation and should be added in the
   future.
+- The `parser.py` class does not handle redirect URLs.
+
+## Further reading
+
+- https://tonybaloney.github.io/posts/sub-interpreter-web-workers.html
+- https://dev.to/welldone2094/async-programming-in-python-with-asyncio-12dl

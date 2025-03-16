@@ -1,11 +1,14 @@
+from typing import Optional
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup  # HTML parsing library
 
 from src.utils import normalize_url
 
+ALLOWED_SCHEMES = ("http", "https", "/")
 
-def parse(base_url, html):
+
+def parse(base_url: str, html: str) -> set[str]:
     """
     Parse the HTML content and extract all valid links.
     :param base_url: The URL of the page being parsed (used to resolve relative URLs).
@@ -24,7 +27,7 @@ def parse(base_url, html):
     return links
 
 
-def _make_absolute_url(base_url, href):
+def _make_absolute_url(base_url: str, href: str) -> Optional[str]:
     """
     Convert a relative URL to an absolute URL and normalize it.
     :param base_url: The base URL of the page.
@@ -32,7 +35,7 @@ def _make_absolute_url(base_url, href):
     :return: The normalized absolute URL, or None if the URL is invalid.
     """
     # Skip unwanted URLs (e.g., mailto, javascript)
-    if not href.startswith(("http", "https")):
+    if not href or not href.startswith(ALLOWED_SCHEMES):
         return None
 
     # Join the base URL and the href to form an absolute URL
