@@ -4,34 +4,64 @@ import logging
 import time
 from urllib.parse import urlparse
 
+from service.parser import parse
 from src.client.http_client import Client
-from src.service.crawler import Crawler
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
 
 logger = logging.getLogger(__name__)
 
-async def worker(start_url: str, depth: int, allowed_netloc: str, reporter: Reporter, frontier: Frontier) -> None:
+async def worker(allowed_netloc: str, reporter: Reporter, frontier: Frontier, max_depth: int,
+                 depth_reached: asyncio.Event) -> None:
     client = Client(allowed_netloc)
+    try:
+        while not depth_reached.is_set():
+            url = await frontier.get_next_url()
+            if url is None:
+                await asyncio.sleep(0.1)  # Prevent tight loop if queue is empty
+                continue
 
-    crawler = Crawler(depth, frontier, client, reporter)
-    await crawler.run()
-    await client.close()
+            final_url, content = await client.fetch(url)
+            if content:
+                links = parse(final_url, content)
+                reporter.record(final_url, links)
+
+                # Check depth before adding new links
+                if len(reporter.results) >= max_depth:
+                    depth_reached.set()
+                    break
+
+                for link in links:
+                    if len(reporter.results) < max_depth:
+                        await frontier.add_url(link)
+                    else:
+                        break
+    finally:
+        await client.close()
 
 async def main(start_url: str, num_workers: int, depth: int) -> None:
     logger.info(f"Starting the crawler with {num_workers} workers...")
-    start_time = time.time()
+    start_time = time.perf_counter()
 
     base_netloc = urlparse(start_url).netloc
-
     frontier = Frontier(base_netloc)
     await frontier.add_url(start_url)
     reporter = Reporter()
 
-    tasks = [worker(start_url, depth, base_netloc, reporter, frontier) for _ in range(num_workers)]
+    # Create a shared event to signal when depth is reached
+    depth_reached = asyncio.Event()
+
+    # Worker tasks
+    tasks = [
+        asyncio.create_task(
+            worker(base_netloc, reporter, frontier, depth, depth_reached)
+        )
+        for _ in range(num_workers)
+    ]
+
     await asyncio.gather(*tasks)
 
-    end_time = time.time()
+    end_time = time.perf_counter()
     duration = end_time - start_time
 
     reporter.output()

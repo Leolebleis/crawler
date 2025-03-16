@@ -16,19 +16,17 @@ class Crawler:
     record the URLs and links and eventually output them.
     """
 
-    def __init__(self, depth: int, frontier: Frontier, client: Client, reporter: Reporter) -> None:
+    def __init__(self, frontier: Frontier, client: Client, reporter: Reporter) -> None:
         self._frontier = frontier
         self._client = client
         self._reporter = reporter
-        self._depth = depth
 
     async def run(self) -> None:
         """
         Run the crawler to fetch and parse URLs.
         :return: None
         """
-        count = 0
-        while self._frontier.has_next() and count < self._depth:
+        while self._frontier.has_next():
             url = await self._frontier.get_next_url()
             if not url:
                 break
@@ -38,4 +36,3 @@ class Crawler:
                 self._reporter.record(final_url, links)
                 for link in links:
                     await self._frontier.add_url(link)
-            count += 1
