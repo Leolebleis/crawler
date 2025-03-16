@@ -17,7 +17,14 @@ class Crawler:
     record the URLs and links and eventually output them.
     """
 
-    def __init__(self, frontier: Frontier, client: Client, reporter: Reporter, max_pages_reached: asyncio.Event, max_pages: int) -> None:
+    def __init__(
+        self,
+        frontier: Frontier,
+        client: Client,
+        reporter: Reporter,
+        max_pages_reached: asyncio.Event,
+        max_pages: int,
+    ) -> None:
         self._frontier = frontier
         self._client = client
         self._reporter = reporter

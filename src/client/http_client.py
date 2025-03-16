@@ -26,7 +26,7 @@ class Client:
         if not self._session:
             self._session = aiohttp.ClientSession(
                 timeout=aiohttp.ClientTimeout(total=10),
-                headers={"User-Agent": "WebCrawler/1.0"}
+                headers={"User-Agent": "WebCrawler/1.0"},
             )
 
         try:
@@ -44,7 +44,9 @@ class Client:
                 # Ensure the response is HTML
                 content_type = response.headers.get("Content-Type", "")
                 if "text/html" not in content_type:
-                    logger.debug(f"Skipping non-HTML content: {final_url} ({content_type})")
+                    logger.debug(
+                        f"Skipping non-HTML content: {final_url} ({content_type})"
+                    )
                     return None, None
 
                 content = await response.text()

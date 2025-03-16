@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 from src.utils import normalize_url
 
+
 class Frontier:
     def __init__(self, allowed_netloc: str) -> None:
         self.allowed_netloc = allowed_netloc

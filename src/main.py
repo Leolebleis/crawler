@@ -11,6 +11,7 @@ from src.service.reporter import Reporter
 
 logger = logging.getLogger(__name__)
 
+
 async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     logger.info(f"Starting the crawler with {num_workers} workers...")
     start_time = time.perf_counter()
@@ -43,8 +44,12 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     logger.debug(f"Crawling completed in {duration:.2f} seconds")
     await client.close()
 
+
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="A simple web crawler.")
     parser.add_argument(
