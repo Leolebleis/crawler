@@ -1,8 +1,7 @@
+import logging
 from typing import Dict, Set
 
-from aiologger import Logger
-
-logger = Logger.with_default_handlers()
+logger = logging.getLogger(__name__)
 
 class Reporter:
     def __init__(self):

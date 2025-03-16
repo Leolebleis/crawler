@@ -1,6 +1,6 @@
 import argparse
 import asyncio
-from aiologger import Logger
+import logging
 import time
 from urllib.parse import urlparse
 
@@ -9,7 +9,7 @@ from src.service.crawler import Crawler
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
 
-logger = Logger.with_default_handlers()
+logger = logging.getLogger(__name__)
 
 async def worker(start_url: str, depth: int, allowed_netloc: str, reporter: Reporter, frontier: Frontier) -> None:
     client = Client(allowed_netloc)
@@ -39,6 +39,7 @@ async def main(start_url: str, num_workers: int, depth: int) -> None:
     logger.debug(f"Crawling completed in {duration:.2f} seconds")
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="A simple web crawler.")
     parser.add_argument(
