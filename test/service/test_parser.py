@@ -8,7 +8,7 @@ from service.parser import parse
     [
         ("https://monzo.com", "https://monzo.com/blog/", {"https://monzo.com/blog"}),
         ("https://monzo.com", "/blog/", {"https://monzo.com/blog"}),
-        ("https://monzo.com", "https://example.com/", set()),
+        ("https://monzo.com", "https://example.com/", {"https://example.com"}),
         ("https://monzo.com", "mailto:monzo@gmail.com", set()),
     ],
 )

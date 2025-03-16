@@ -14,7 +14,7 @@ from service.frontier import Frontier
     ],
 )
 async def test_frontier(url: str, expected: str, allowed_netloc: str) -> None:
-    frontier = Frontier(allowed_netloc=allowed_netloc)
+    frontier = Frontier(allowed_netloc=allowed_netloc, timeout=1)
 
     await frontier.add_url(url)
 

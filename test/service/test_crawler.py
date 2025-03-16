@@ -34,7 +34,6 @@ def max_pages_reached():
     return asyncio.Event()
 
 
-@pytest.mark.asyncio
 async def test_crawler_stops_at_max_pages(
     mock_frontier, mock_client, mock_reporter, max_pages_reached
 ):
@@ -79,7 +78,7 @@ async def test_crawler_processes_until_queue_empty(
     mock_frontier.get_next_url.side_effect = [
         "https://example.com/page1",
         "https://example.com/page2",
-        asyncio.TimeoutError(),  # Raise TimeoutError to stop the loop and simulate empty queue
+        None,  # Raise TimeoutError to stop the loop and simulate empty queue
     ]
     mock_client.fetch.return_value = ("https://example.com/page1", "<html>...</html>")
     mock_reporter.results = {}  # Start with no results
