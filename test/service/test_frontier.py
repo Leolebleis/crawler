@@ -1,6 +1,6 @@
 import pytest
 
-from service.frontier import Frontier
+from src.service.frontier import Frontier
 
 
 @pytest.mark.parametrize(

@@ -5,6 +5,9 @@ import pytest
 
 from src.service.crawler import Crawler
 
+class TestException(Exception):
+    pass
+
 
 @pytest.fixture
 def mock_frontier():
@@ -105,17 +108,18 @@ async def test_crawler_handles_fetch_errors(
 ):
     # Mock behavior
     mock_frontier.get_next_url.return_value = "https://example.com/page1"
-    mock_client.fetch.side_effect = Exception("Fetch failed")  # Simulate fetch error
+    mock_client.fetch.side_effect = TestException("Fetch failed")  # Simulate fetch error
     mock_reporter.results = {}  # Start with no results
 
-    # Run crawler
-    await Crawler(
-        frontier=mock_frontier,
-        client=mock_client,
-        reporter=mock_reporter,
-        max_pages_reached=max_pages_reached,
-        max_pages=5,
-    ).run()
+    with pytest.raises(TestException):
+        # Run crawler
+        await Crawler(
+            frontier=mock_frontier,
+            client=mock_client,
+            reporter=mock_reporter,
+            max_pages_reached=max_pages_reached,
+            max_pages=5,
+        ).run()
 
     # Assertions
     mock_reporter.record.assert_not_called()  # Ensure record was not called

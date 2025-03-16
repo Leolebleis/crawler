@@ -40,8 +40,8 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     duration = end_time - start_time
 
     reporter.output()
+    logger.info(f"Crawled {len(reporter.results)} pages in {duration:.2f} seconds")
 
-    logger.debug(f"Crawling completed in {duration:.2f} seconds")
     await client.close()
 
 
@@ -54,6 +54,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A simple web crawler.")
     parser.add_argument(
         "--start-url",
+        type=str,
         default="https://monzo.com",
         help="The URL to start crawling from. Defaults to https://monzo.com.",
     )
