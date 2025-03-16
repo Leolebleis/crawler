@@ -8,12 +8,12 @@ from src.client.http_client import Client
 
 
 @pytest.fixture
-def client():
+def client() -> Client:
     """Fixture to create a Client instance."""
     return Client(allowed_netloc="example.com")
 
 
-async def test_fetch_success(client):
+async def test_fetch_success(client: Client) -> None:
     """Test successful fetch of a URL."""
     url = "https://example.com/page1"
     content = "<html><body>Hello, World!</body></html>"
@@ -30,7 +30,7 @@ async def test_fetch_success(client):
         assert fetched_content == content
 
 
-async def test_fetch_non_html_content(client):
+async def test_fetch_non_html_content(client: Client) -> None:
     """Test fetching non-HTML content."""
     url = "https://example.com/image.png"
     content = "binary data"
@@ -47,7 +47,7 @@ async def test_fetch_non_html_content(client):
         assert fetched_content is None
 
 
-async def test_fetch_http_error(client):
+async def test_fetch_http_error(client: Client) -> None:
     """Test fetching a URL that returns an HTTP error."""
     url = "https://example.com/error"
 
@@ -63,7 +63,7 @@ async def test_fetch_http_error(client):
         assert fetched_content is None
 
 
-async def test_fetch_network_error(client):
+async def test_fetch_network_error(client: Client) -> None:
     """Test fetching a URL that causes a network error."""
     url = "https://example.com/network-error"
 
@@ -79,7 +79,7 @@ async def test_fetch_network_error(client):
         assert fetched_content is None
 
 
-async def test_close_session(client):
+async def test_close_session(client: Client) -> None:
     """Test closing the aiohttp session."""
     # Create a mock session
     with patch("aiohttp.ClientSession") as mock_session:

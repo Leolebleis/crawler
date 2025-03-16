@@ -10,7 +10,7 @@ class TestException(Exception):
 
 
 @pytest.fixture
-def mock_frontier():
+def mock_frontier() -> MagicMock:
     frontier = MagicMock()
     frontier.get_next_url = AsyncMock()
     frontier.add_url = AsyncMock()
@@ -18,14 +18,14 @@ def mock_frontier():
 
 
 @pytest.fixture
-def mock_client():
+def mock_client() -> MagicMock:
     client = MagicMock()
     client.fetch = AsyncMock()
     return client
 
 
 @pytest.fixture
-def mock_reporter():
+def mock_reporter() -> MagicMock:
     reporter = MagicMock()
     reporter.results = {}
     reporter.record = MagicMock()
@@ -33,13 +33,13 @@ def mock_reporter():
 
 
 @pytest.fixture
-def max_pages_reached():
+def max_pages_reached() -> asyncio.Event:
     return asyncio.Event()
 
 
 async def test_crawler_stops_at_max_pages(
-    mock_frontier, mock_client, mock_reporter, max_pages_reached
-):
+    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+) -> None:
     # Mock behavior
     urls = [f"https://example.com/page{i}" for i in range(5)]
     mock_frontier.get_next_url.side_effect = urls
@@ -75,8 +75,8 @@ async def test_crawler_stops_at_max_pages(
 
 
 async def test_crawler_processes_until_queue_empty(
-    mock_frontier, mock_client, mock_reporter, max_pages_reached
-):
+    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+) -> None:
     # Mock behavior
     mock_frontier.get_next_url.side_effect = [
         "https://example.com/page1",
@@ -104,8 +104,8 @@ async def test_crawler_processes_until_queue_empty(
 
 
 async def test_crawler_handles_fetch_errors(
-    mock_frontier, mock_client, mock_reporter, max_pages_reached
-):
+    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+) -> None:
     # Mock behavior
     mock_frontier.get_next_url.return_value = "https://example.com/page1"
     mock_client.fetch.side_effect = TestException("Fetch failed")  # Simulate fetch error

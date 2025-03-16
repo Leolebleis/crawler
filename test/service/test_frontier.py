@@ -14,6 +14,8 @@ from src.service.frontier import Frontier
     ],
 )
 async def test_frontier(url: str, expected: str, allowed_netloc: str) -> None:
+    # We set the timeout to 1, the smallest possible value. This is not ideal as it still blocks the execution and
+    # makes the test slower.
     frontier = Frontier(allowed_netloc=allowed_netloc, timeout=1)
 
     await frontier.add_url(url)

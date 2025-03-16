@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup  # HTML parsing library
 
 from src.utils import normalize_url
 
-ALLOWED_SCHEMES = ("http", "https", "/")
+_ALLOWED_PREFIXES = ("http", "https", "/")
 
 
 def parse(base_url: str, html: str) -> set[str]:
@@ -35,7 +35,7 @@ def _make_absolute_url(base_url: str, href: str) -> Optional[str]:
     :return: The normalized absolute URL, or None if the URL is invalid.
     """
     # Skip unwanted URLs (e.g., mailto, javascript)
-    if not href or not href.startswith(ALLOWED_SCHEMES):
+    if not href or not href.startswith(_ALLOWED_PREFIXES):
         return None
 
     # Join the base URL and the href to form an absolute URL

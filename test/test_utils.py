@@ -12,6 +12,6 @@ from src.utils import normalize_url
         ("https://monzo.com/about?", "https://monzo.com/about"),
     ],
 )
-def test_normalize_url(url: str, expected: str):
+def test_normalize_url(url: str, expected: str) -> None:
     result = normalize_url(url)
     assert result == expected

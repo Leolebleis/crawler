@@ -9,11 +9,13 @@ from src.client.http_client import Client
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
 
-logger = logging.getLogger(__name__)
+_DEFAULT_LOG_LEVEL = logging.INFO
+
+_logger = logging.getLogger(__name__)
 
 
 async def main(start_url: str, num_workers: int, max_pages: int) -> None:
-    logger.info(f"Starting the crawler with {num_workers} workers...")
+    _logger.info(f"Starting the crawler with {num_workers} workers...")
     start_time = time.perf_counter()
 
     base_netloc = urlparse(start_url).netloc
@@ -40,14 +42,14 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     duration = end_time - start_time
 
     reporter.output()
-    logger.info(f"Crawled {len(reporter.results)} pages in {duration:.2f} seconds")
+    _logger.info(f"Crawled {len(reporter.results)} pages in {duration:.2f} seconds")
 
     await client.close()
 
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=_DEFAULT_LOG_LEVEL,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
     # Parse command-line arguments

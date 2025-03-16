@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Set
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class Reporter:
@@ -24,8 +24,8 @@ class Reporter:
         Output the results to the console using logger.info.
         """
         for url, links in self.results.items():
-            logger.info(f"URL: {url}")
-            logger.info("Links:")
+            _logger.info(f"URL: {url}")
+            _logger.info("Links:")
             for link in links:
-                logger.info(f"  - {link}")
-            logger.info("")  # Add a blank line between entries
+                _logger.info(f"  - {link}")
+            _logger.info("")  # Add a blank line between entries

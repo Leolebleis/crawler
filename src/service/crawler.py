@@ -6,7 +6,7 @@ from src.service.frontier import Frontier
 from src.service.parser import parse
 from src.service.reporter import Reporter
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class Crawler:
