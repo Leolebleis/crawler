@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, Set
 
 _logger = logging.getLogger(__name__)
 
@@ -9,7 +8,7 @@ class Reporter:
         """
         Initialize the Reporter.
         """
-        self.results: Dict[str, Set[str]] = {}  # Maps URLs to their discovered links
+        self.results: dict[str, set[str]] = {}  # Maps URLs to their discovered links
 
     def record(self, url, links):
         """
