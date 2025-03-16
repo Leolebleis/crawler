@@ -7,24 +7,24 @@ from src.utils import normalize_url
 
 class Frontier:
     def __init__(self, allowed_netloc: str) -> None:
-        self.allowed_netloc = allowed_netloc
-        self.visited = set()
-        self.queue = asyncio.Queue()
+        self._allowed_netloc = allowed_netloc
+        self._visited = set()
+        self._queue = asyncio.Queue()
 
     async def add_url(self, url: str) -> None:
         normalized_url = normalize_url(url)
-        if self._is_valid_url(normalized_url) and normalized_url not in self.visited:
-            self.visited.add(normalized_url)
-            await self.queue.put(normalized_url)
+        if self._is_valid_url(normalized_url) and normalized_url not in self._visited:
+            self._visited.add(normalized_url)
+            await self._queue.put(normalized_url)
 
     async def get_next_url(self) -> Optional[str]:
-        if not self.queue.empty():
-            return await self.queue.get()
+        if not self._queue.empty():
+            return await self._queue.get()
         return None
 
     def _is_valid_url(self, url: str) -> bool:
         parsed_url = urlparse(url)
-        return parsed_url.netloc == self.allowed_netloc
+        return parsed_url.netloc == self._allowed_netloc
 
     def has_next(self) -> bool:
-        return not self.queue.empty()
+        return not self._queue.empty()
