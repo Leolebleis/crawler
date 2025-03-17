@@ -17,6 +17,7 @@ As the program uses asyncio, all the workers run on a single thread.
 ## Architecture
 
 The web crawler consists of the following components:
+
 - **Frontier**: Manages the queue of URLs to crawl and ensures URLs are not visited multiple times.
 - **Client**: Handles HTTP requests to fetch web pages.
 - **Parser**: Extracts links from HTML content.
@@ -45,6 +46,7 @@ documented and easy to use.
 ### Installation
 
 To install the required dependencies, run the following command:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -52,11 +54,13 @@ pip install -r requirements.txt
 ### Running the crawler
 
 To run the crawler, run the following command:
+
 ```bash
 python -m src.main
 ```
 
 You can also add the following optional arguments:
+
 - `--url`: The URL to start the crawl from. Default is `https://monzo.com`.
 - `--workers`: The number of workers to use. Default is 5.
 - `--max-pages`: The maximum number of pages to crawl. Default is 10.
@@ -64,6 +68,7 @@ You can also add the following optional arguments:
 ### Pre-commit hook
 
 To install the pre-commit hook, run the following command:
+
 ```bash
 pip install pre-commit
 pre-commit install
@@ -74,18 +79,19 @@ This will make sure that the code is linted and formatted before each commit.
 ## Testing
 
 To run the tests, run the following command:
+
 ```bash
 pytest
 ```
 
 ## Assumptions and Limitations
 
-- It is technically possible that the program will return more than the maximum number of pages specified. This is
-  because with multiple workers, it is possible that the max_pages_reached event is triggered while some workers are
-  still processing their current page. This is a limitation of the current implementation.
 - The program does not check robots.txt. This is a limitation of the current implementation and should be added in the
   future.
-- The `parser.py` class does not handle redirect URLs.
+- Because each Crawler is its own task, and executes concurrently, this can lead to over-fetching. Meaning that even
+  though the `max_pages_reached: asyncio.Event` event has already been set, a crawler might have already started to
+  fetch the next page. This leads to scenarios where `max_pages = 10`, yet the `Client` will have fetched 14 pages. This
+  won't be reflected in the `Reporter` as there is a maximum size implemented.
 
 ## Further reading
 

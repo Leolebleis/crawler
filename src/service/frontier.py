@@ -9,6 +9,11 @@ _logger = logging.getLogger(__name__)
 
 
 class Frontier:
+    """
+    Frontier is responsible for managing the URLs to be crawled.
+    It maintains a queue of URLs and ensures that only valid URLs are added.
+    It also keeps track of visited URLs to avoid duplicates.
+    """
     def __init__(self, allowed_netloc: str, timeout: int = 10) -> None:
         self._allowed_netloc = allowed_netloc
         self._visited = set()

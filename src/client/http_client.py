@@ -9,6 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class Client:
+    """
+    Client is responsible for making HTTP requests to fetch the content of URLs.
+    It uses aiohttp for asynchronous requests and handles redirects and content type checks.
+    It ensures that only HTML content from the allowed domain is processed.
+    """
     def __init__(self, allowed_netloc: str) -> None:
         """
         Initialize the Client.
@@ -21,7 +26,7 @@ class Client:
         """
         Fetch the content of a URL asynchronously.
         :param url: The URL to fetch.
-        :return: A tuple containing the URL and content, or None if an error occurred.
+        :return: A tuple containing the URL (after redirects) and content, or None if an error occurred.
         """
         if not self._session:
             self._session = aiohttp.ClientSession(
@@ -34,7 +39,7 @@ class Client:
             async with self._session.get(url) as response:
                 response.raise_for_status()  # Raise an exception for HTTP errors (4xx, 5xx)
 
-                # Ensure the final URL is within the allowed domain
+                # Ensure the final URL is within the allowed domain after redirects
                 final_url = str(response.url)
                 if urlparse(final_url).netloc != self._allowed_netloc:
                     logger.debug(f"Skipping external URL: {final_url}")

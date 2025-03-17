@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 def normalize_url(url: str) -> str:
     """
     Normalize a URL to avoid processing duplicates.
+    E.g., "http://example.com" and "http://example.com/" should be treated as the same URL.
     :param url: The URL to normalize.
     :return: The normalized URL.
     """

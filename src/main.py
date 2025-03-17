@@ -9,7 +9,7 @@ from src.client.http_client import Client
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
 
-_DEFAULT_LOG_LEVEL = logging.INFO
+_DEFAULT_LOG_LEVEL = logging.DEBUG
 
 _logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     frontier = Frontier(base_netloc)
     # We add the start URL to the frontier to kick off the crawling process.
     await frontier.add_url(start_url)
-    reporter = Reporter()
+    reporter = Reporter(max_pages)
     client = Client(base_netloc)
 
     # Create a shared event to signal when max number of pages is reached.
@@ -33,9 +33,9 @@ async def main(start_url: str, num_workers: int, max_pages: int) -> None:
     # We create the workers, each of which will run an instance of the Crawler class.
     tasks = [
         asyncio.create_task(
-            Crawler(frontier, client, reporter, max_pages_reached, max_pages).run()
+            Crawler(i + 1, frontier, client, reporter, max_pages_reached, max_pages).run()
         )
-        for _ in range(num_workers)
+        for i in range(num_workers)
     ]
 
     await asyncio.gather(*tasks)

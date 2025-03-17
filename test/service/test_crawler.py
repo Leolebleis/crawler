@@ -47,14 +47,13 @@ async def test_crawler_runs_successfully(
         None,  # Simulate empty queue
     ]
     mock_client.fetch.side_effect = [
-        ("https://example.com/page1", """<html>
-            <a href="https://example.com/page3">Link</a>
-        </html>"""),
+        ("https://example.com/page1", """<html><a href="https://example.com/page3">Link</a></html>"""),
         ("https://example.com/page2", """<html><a href="https://example.com/page4">Link</a></html>"""),
     ]
     mock_reporter.results = {}  # Start with no results
 
     crawler = Crawler(
+        worker_id=1,
         frontier=mock_frontier,
         client=mock_client,
         reporter=mock_reporter,
@@ -94,6 +93,7 @@ async def test_crawler_stops_at_max_pages(
 
     max_pages = 1
     crawler = Crawler(
+        worker_id=1,
         frontier=mock_frontier,
         client=mock_client,
         reporter=mock_reporter,
@@ -104,9 +104,9 @@ async def test_crawler_stops_at_max_pages(
     # Run the crawler
     await crawler.run()
 
-    # Check the results
+    # Check the reporter only has the right number of pages
     assert mock_reporter.record.call_count == max_pages
-    assert mock_frontier.get_next_url.call_count == max_pages
+    assert len(mock_reporter.results) == max_pages
 
 
 async def test_crawler_processes_until_queue_empty(
@@ -122,6 +122,7 @@ async def test_crawler_processes_until_queue_empty(
     mock_reporter.results = {}  # Start with no results
 
     crawler = Crawler(
+        worker_id=1,
         frontier=mock_frontier,
         client=mock_client,
         reporter=mock_reporter,
@@ -138,7 +139,7 @@ async def test_crawler_processes_until_queue_empty(
     mock_reporter.record.assert_called()
 
 
-async def test_crawler_handles_fetch_errors(
+async def test_crawler_handles_unexpected_fetch_errors(
     mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
 ) -> None:
     # Mock behavior
@@ -149,6 +150,7 @@ async def test_crawler_handles_fetch_errors(
     with pytest.raises(TestException):
         # Run crawler
         await Crawler(
+            worker_id=1,
             frontier=mock_frontier,
             client=mock_client,
             reporter=mock_reporter,

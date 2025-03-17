@@ -19,12 +19,14 @@ class Crawler:
 
     def __init__(
         self,
+        worker_id: int,
         frontier: Frontier,
         client: Client,
         reporter: Reporter,
         max_pages_reached: asyncio.Event,
         max_pages: int,
     ) -> None:
+        self._id = worker_id
         self._frontier = frontier
         self._client = client
         self._reporter = reporter
@@ -37,23 +39,32 @@ class Crawler:
         :return: None
         """
         while not self._max_pages_reached.is_set():
-            # Check number of pages before adding new links
-            if len(self._reporter.results) >= self._max_pages:
-                self._max_pages_reached.set()
-                break
-
             url = await self._frontier.get_next_url()
             if not url:
+                _logger.debug(f"Queue is empty. Stopping the crawler worker with id={self._id}.")
+                break
+
+            if self._is_max_pages_reached():
+                self._max_pages_reached.set()
+                _logger.debug(f"Max number of pages reached. Stopping the crawler worker with id={self._id}.")
                 break
 
             final_url, content = await self._client.fetch(url)
-            if content:
-                links = parse(final_url, content)
+            if not content:
+                _logger.error(f"Failed to fetch content from {url}.")
+                continue
+            links = parse(final_url, content)
 
-                self._reporter.record(final_url, links)
+            self._reporter.record(url, links)
 
-                for link in links:
-                    if len(self._reporter.results) < self._max_pages:
-                        await self._frontier.add_url(link)
-                    else:
-                        break
+            for link in links:
+                await self._frontier.add_url(link)
+
+        _logger.info(f"Stopping the crawler worker with id={self._id}.")
+
+    def _is_max_pages_reached(self) -> bool:
+        """
+        Check if the maximum number of pages has been reached.
+        :return: True if max pages reached, False otherwise.
+        """
+        return len(self._reporter.results) >= self._max_pages
