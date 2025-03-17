@@ -1,6 +1,6 @@
 from _pytest.logging import LogCaptureFixture
 
-from service.reporter import Reporter
+from src.service.reporter import Reporter
 
 
 def test_record_new_url() -> None:
@@ -13,6 +13,7 @@ def test_record_new_url() -> None:
 
     assert url in reporter.results
     assert reporter.results[url] == links
+
 
 def test_record_new_url_max_size_reached() -> None:
     max_size = 1
@@ -29,6 +30,7 @@ def test_record_new_url_max_size_reached() -> None:
     assert url in reporter.results
     assert reporter.results[url] == links
     assert url2 not in reporter.results
+
 
 def test_output(caplog: LogCaptureFixture) -> None:
     reporter = Reporter(max_size=10)

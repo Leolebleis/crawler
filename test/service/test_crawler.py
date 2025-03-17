@@ -5,7 +5,9 @@ import pytest
 
 from src.service.crawler import Crawler
 
+
 class TestException(Exception):
+    __test__ = False
     pass
 
 
@@ -38,7 +40,7 @@ def max_pages_reached() -> asyncio.Event:
 
 
 async def test_crawler_runs_successfully(
-    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+        mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
 ) -> None:
     # Mock behavior
     mock_frontier.get_next_url.side_effect = [
@@ -71,8 +73,9 @@ async def test_crawler_runs_successfully(
     assert mock_reporter.record.call_count == 2
     assert mock_frontier.add_url.call_count == 2
 
+
 async def test_crawler_stops_at_max_pages(
-    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+        mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
 ) -> None:
     # Mock behavior
     urls = [f"https://example.com/page{i}" for i in range(5)]
@@ -110,7 +113,7 @@ async def test_crawler_stops_at_max_pages(
 
 
 async def test_crawler_processes_until_queue_empty(
-    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+        mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
 ) -> None:
     # Mock behavior
     mock_frontier.get_next_url.side_effect = [
@@ -140,7 +143,7 @@ async def test_crawler_processes_until_queue_empty(
 
 
 async def test_crawler_handles_unexpected_fetch_errors(
-    mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
+        mock_frontier: MagicMock, mock_client: MagicMock, mock_reporter: MagicMock, max_pages_reached: asyncio.Event
 ) -> None:
     # Mock behavior
     mock_frontier.get_next_url.return_value = "https://example.com/page1"

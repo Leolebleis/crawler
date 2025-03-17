@@ -9,6 +9,7 @@ class Reporter:
     It maintains a dictionary mapping URLs to sets of links.
     The output method prints the results to the console.
     """
+
     def __init__(self, max_size: int) -> None:
         """
         Initialize the Reporter.

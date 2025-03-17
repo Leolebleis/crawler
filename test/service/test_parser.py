@@ -1,6 +1,6 @@
 import pytest
 
-from service.parser import parse
+from src.service.parser import parse
 
 
 @pytest.mark.parametrize(

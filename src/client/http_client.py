@@ -14,6 +14,7 @@ class Client:
     It uses aiohttp for asynchronous requests and handles redirects and content type checks.
     It ensures that only HTML content from the allowed domain is processed.
     """
+
     def __init__(self, allowed_netloc: str) -> None:
         """
         Initialize the Client.

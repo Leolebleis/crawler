@@ -18,13 +18,13 @@ class Crawler:
     """
 
     def __init__(
-        self,
-        worker_id: int,
-        frontier: Frontier,
-        client: Client,
-        reporter: Reporter,
-        max_pages_reached: asyncio.Event,
-        max_pages: int,
+            self,
+            worker_id: int,
+            frontier: Frontier,
+            client: Client,
+            reporter: Reporter,
+            max_pages_reached: asyncio.Event,
+            max_pages: int,
     ) -> None:
         self._id = worker_id
         self._frontier = frontier
