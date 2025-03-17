@@ -46,6 +46,7 @@ documented and easy to use.
 
 - Python > 3.12
 - Pip > 23.2.1
+- [A virtualenv to install the dependencies](https://virtualenv.pypa.io/en/latest/user_guide.html)
 
 ### Installation
 
