@@ -24,17 +24,16 @@ The web crawler consists of the following components:
 - **Reporter**: Records the results of the crawl (e.g., URLs and their links).
 - **Crawler**: Orchestrates the crawling process by coordinating the other components.
 
-The program uses an event-driven architecture with `asyncio` to enable concurrent fetching and processing of URLs.
-
 ### Asyncio and the Global Interpreter Lock (GIL)
 
 Until Python 3.12, the Global Interpreter Lock (GIL) acted as a mutex that protected access to Python objects, meaning
-that even if you had multiple threads, only one could execute Python code at a time. This was a limitation of the
+that even if you had multiple threads, only one could execute Python code at a time. This is a limitation of the
 language itself. One advantage of this approach is that it makes it easier to write thread-safe code, as the GIL ensures
-thread-safety. One big drawback is that Python threads cannot take advantage of multiple cores.
+acts as a mutex and any python bytecode requires acquiring the interpreter lock to execute. One big drawback is that
+Python threads cannot take advantage of multiple cores.
 
-With more recent versions of Python, the GIL has been relaxed, allowing for concurrency. This is achieved through
-sub-interpreters, which are separate interpreters that run in separate threads with their own GIL. This is not
+With more recent versions of Python, the GIL has been relaxed, allowing for parallelism. This is achieved through
+sub-interpreters, which are separate interpreters that run in separate threads with their own GIL.
 
 With modern Python, there are many ways to achieve concurrency, each with their own trade-offs. However, this program
 uses asyncio, or coroutines, which run on a single thread. This approach achieves concurrency, _but not parallelism_. As
@@ -42,6 +41,11 @@ the main bottleneck in this application is the network I/O, asyncio is a good ch
 documented and easy to use.
 
 ## Running
+
+### Requirements
+
+- Python > 3.12
+- Pip > 23.2.1
 
 ### Installation
 
