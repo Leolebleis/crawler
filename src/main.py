@@ -4,7 +4,7 @@ import logging
 import time
 from urllib.parse import urlparse
 
-from service.crawler import Crawler
+from src.service.crawler import Crawler
 from src.client.http_client import Client
 from src.service.frontier import Frontier
 from src.service.reporter import Reporter
